@@ -1,0 +1,2 @@
+python manage.py startapp bookings hotelManagement/sapps/bookings
+py manage.py runserver
