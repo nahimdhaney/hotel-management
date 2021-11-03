@@ -1,12 +1,14 @@
 from django.shortcuts import render
 from rest_framework.decorators import api_view
 from rest_framework.views import APIView
-from .models import Client
+from django.db.transaction import atomic
+from django.db import transaction
+from .models import Client,Room,Booking,BookingRoom
 from rest_framework.response import Response
-from .serializers import ClientMSerializer
-
+from .serializers import ClientMSerializer,RoomSerializer,BookingRoomSerializer,BookingSerializer
+from rest_framework.exceptions import ValidationError
 @api_view(['GET','POST','PUT'])
-def ClientViewSet(request):
+def ClientViewSet(request,*args,**kwargs):
     if request.method == 'GET':
         clients = Client.objects.all()
         data = []
@@ -18,14 +20,73 @@ def ClientViewSet(request):
         if serializer.is_valid(raise_exception=True) :
             serializer.save() # saving Cliente instance
             data = serializer.data
-    if request.method == 'PUT':
-        client = Client.objects.get(id=request.data['id'])
-        user = User.objects.get(id=request.data['user'])
-        serializer = ClientMSerializer(client, data=request.data)
-        user_serializer = UserSerializer(user, data=request.data)
-        if serializer.is_valid(raise_exception=True) and user_serializer.is_valid(raise_exception=True):
-            serializer.save() # saving Cliente instance
-            user_serializer.save()
-            data = serializer.data
             
+    return Response(data)
+
+
+
+@api_view(['GET','POST'])
+def RoomViewSet(request,*args,**kwargs):
+    if request.method == 'GET':
+        rooms = Room.objects.all()
+        data = []
+        for room in rooms:
+            serializer = RoomSerializer(room)
+            data.append(serializer.data)
+    if request.method == 'POST':
+        serializer = RoomSerializer(data=request.data)
+        if serializer.is_valid(raise_exception=True) :
+            serializer.save()
+            data = serializer.data
+    return Response(data)
+
+@atomic
+@api_view(['GET','POST','PATCH'])
+def BookingViewSet(request,*args,**kwargs):
+    if request.method == 'GET':
+        bookings = Booking.objects.all()
+        if id in kwargs:
+            bookings = bookings.filter(id=kwargs['id'])
+        data = []
+        for book in bookings:
+            serializer = BookingSerializer(book)
+            booked_rooms = BookingRoom.objects.filter(booking=serializer.data['id'])
+            completeObj = serializer.data
+            # import pdb; pdb.set_trace()
+            completeObj['rooms'] = []
+            for booked_room in booked_rooms:
+                booked_room_serialized = BookingRoomSerializer(booked_room)
+                completeObj['rooms'].append(booked_room_serialized.data)
+            # completeObj['rooms'] = booked_rooms
+            data.append(completeObj)
+    elif request.method == 'POST':
+        serializer = BookingSerializer(data=request.data)
+        if serializer.is_valid(raise_exception=True) :
+            serializer.save()
+            booking = serializer.data #I got the id of the booking
+            # import pdb; pdb.set_trace()
+            objRooms = []
+            data = booking
+            for room in request.data['rooms']:
+                objRoom = room
+                print(booking)
+                # import pdb; pdb.set_trace()
+                objRoom['booking'] = booking['id'] 
+                booking['rooms'] = []
+                booked_room_serializer = BookingRoomSerializer(data=objRoom)
+                if booked_room_serializer.is_valid():
+                    booked_room_serializer.save()
+                    booking['rooms'].append(booked_room_serializer.data)
+                else:
+                    transaction.set_rollback(True) 
+                    raise ValidationError(booked_room_serializer.errors)
+            data = booking
+    elif request.method == 'PATCH':
+        if kwargs['id'] is not None:
+            booking = Booking.objects.get(id=kwargs['id'])
+            booking.status = request.data['status']
+            booking.save()
+            data = BookingSerializer(booking).data
+        else:
+            pass
     return Response(data)

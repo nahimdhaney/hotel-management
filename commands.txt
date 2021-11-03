@@ -1,2 +1,4 @@
 python manage.py startapp bookings hotelManagement/sapps/bookings
 py manage.py runserver
+mypy palindrome.py --check-untyped-defs  : verifica tipado estático
+.\venv\Scripts\activate
