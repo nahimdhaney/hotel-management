@@ -3,7 +3,7 @@ Field's Serializers
 """
 
 from rest_framework import serializers
-from hotelManagement.apps.bookings.models import Client,Room,Booking,BookingRoom,Invoice
+from hotelManagement.apps.bookings.models import Client,Room,Booking,BookingRoom,Invoice,Payment
 from .models import Client,Room,Booking,BookingRoom
 from django.db.models import Q
 
@@ -45,7 +45,9 @@ class BookingRoomSerializer(serializers.ModelSerializer):
         if BookingRoom.objects.filter(
             (Q(inicial_date__range=(data['inicial_date'],data['final_date'])) | 
             Q(final_date__range=(data['inicial_date'],data['final_date']))) & 
-            Q(room=data['room'])).exists():
+            Q(room=data['room']) &
+            ~Q(status=3)
+            ).exists():
             # .format(2*(height + width),height*width)
             raise (serializers.ValidationError(
                 "Room nro {} is occupied between dates {} and {}".
@@ -53,3 +55,18 @@ class BookingRoomSerializer(serializers.ModelSerializer):
             ))
         return data
 
+
+class InvoiceSerializer(serializers.ModelSerializer):
+    """Invoice Serializer"""
+    id = serializers.ReadOnlyField()
+    class Meta:
+        model = Invoice
+        fields = '__all__'
+
+
+class PaymentSerializer(serializers.ModelSerializer):
+    """Invoice Serializer"""
+    id = serializers.ReadOnlyField()
+    class Meta:
+        model = Invoice
+        fields = '__all__'

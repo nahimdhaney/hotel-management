@@ -7,7 +7,9 @@ from .models import Client,Room,Booking,BookingRoom
 from rest_framework.response import Response
 from .serializers import ClientMSerializer,RoomSerializer,BookingRoomSerializer,BookingSerializer
 from rest_framework.exceptions import ValidationError
-@api_view(['GET','POST','PUT'])
+from django.db.models import Q
+
+@api_view(['GET','POST'])
 def ClientViewSet(request,*args,**kwargs):
     if request.method == 'GET':
         clients = Client.objects.all()
@@ -39,6 +41,27 @@ def RoomViewSet(request,*args,**kwargs):
             serializer.save()
             data = serializer.data
     return Response(data)
+
+
+@api_view(['GET'])
+def AvailableRoomsViewSet(request,*args,**kwargs):
+    if request.method == 'GET':
+
+        bookedRooms = BookingRoom.objects.filter(
+            (Q(inicial_date__range=(request.query_params.get('inicial_date'),request.query_params.get('final_date'))) | 
+            Q(final_date__range=(request.query_params.get('inicial_date'),request.query_params.get('final_date')))) & 
+            ~Q(status=3)
+        )#occupated dates
+        rooms = Room.objects.all()
+        rooms = rooms.exclude(id__in=bookedRooms.values('booking'))
+        
+        data = []
+        for room in rooms:
+            serializer = RoomSerializer(room)
+            data.append(serializer.data)
+    return Response(data)
+
+
 
 @atomic
 @api_view(['GET','POST','PATCH'])
@@ -90,3 +113,4 @@ def BookingViewSet(request,*args,**kwargs):
         else:
             pass
     return Response(data)
+    
