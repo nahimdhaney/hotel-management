@@ -168,6 +168,86 @@ Identifica cuales y cuantas habitaciones puedo reservar.
 | `final_date`| `date` | **Required**. fecha final de consulta |
 
 
+
+#### Post Payments
+Registro de pagos.
+
+```http
+  POST v1/api/bookings/payments
+
+```
+
+| Parameter | Type     | Description                |
+| :-------- | :------- | :------------------------- |
+| - | - | - |
+
+Body Example
+
+```
+{
+    "number":"1",
+    "booking":2,
+    "status":1,
+    "method":1,
+    "date":"2021-11-03",
+    "amount":50.05
+}
+```
+
+#### Get Payments
+Obtiene los pagos registradas
+
+```http
+  GET v1/api/bookings/payments
+```
+
+| Parameter | Type     | Description                |
+| :-------- | :------- | :------------------------- |
+| - | - | - |
+
+
+#### Post Invoices
+Registro de facturas.
+
+```http
+  POST v1/api/bookings/invoices
+
+```
+
+| Parameter | Type     | Description                |
+| :-------- | :------- | :------------------------- |
+| - | - | - |
+
+Body Example
+
+```
+{
+    "nit":"12345439",
+    "booking":2,
+    "status":1,
+    "name":"Nahim Terrazas",
+    "number":"1",
+    "auth_number":"213431342304030",
+    "code_control":"2K-5F-D2-5F",
+    "discount":0,
+    "total":50.05,
+    "date":"2021-11-03"
+}
+```
+
+#### Get Invoices
+Obtiene los pagos invoices
+
+```http
+  GET v1/api/bookings/payments
+```
+
+| Parameter | Type     | Description                |
+| :-------- | :------- | :------------------------- |
+| - | - | - |
+
+
+
 ## Installation
 
 Install python
