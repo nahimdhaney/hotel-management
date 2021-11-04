@@ -65,8 +65,8 @@ class InvoiceSerializer(serializers.ModelSerializer):
 
 
 class PaymentSerializer(serializers.ModelSerializer):
-    """Invoice Serializer"""
+    """Payment Serializer"""
     id = serializers.ReadOnlyField()
     class Meta:
-        model = Invoice
+        model = Payment
         fields = '__all__'
