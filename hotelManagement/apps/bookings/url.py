@@ -14,5 +14,6 @@ urlpatterns = [
 	path('bookings/<int:id>', views.BookingViewSet, name="booking"),
 	path('bookings/', views.BookingViewSet, name="booking"),
 	path('availableRooms/', views.AvailableRoomsViewSet, name="availableRooms"),
-	# path('invoices/', views.InvoiceViewSet, name="client"),
+	path('invoices/', views.InvoiceViewSet, name="invoice"),
+	path('payments/', views.PaymentViewSet, name="payments"),
     ]

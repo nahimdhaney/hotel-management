@@ -64,7 +64,7 @@ class BookingAPITestCase(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
     def test_booking_not_same_day(self):
-        """Booking should only accept 1."""
+        """Booking should be denied because the room has been already booked."""
         client_api = APIClient()
         objBooking = {"client":self.client_db.id,"rooms":[{"room":self.room_db.id,"inicial_date":"2021-11-02","final_date":"2021-11-02"}]}
         response =client_api.post(self.url_booking,objBooking,format='json')

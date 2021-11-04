@@ -36,25 +36,7 @@ class Room(models.Model):
 
 
 
-class Invoice(models.Model):
-    """Invoice model
-    which represents an local invoice,
-    previosly should 
-    """
-    nit = models.TextField(max_length=25)
-    name = models.TextField(max_length=100)
-    number = models.IntegerField()
-    status = models.TextField(max_length=100)
-    auth_number = models.TextField(max_length=25)
-    code_control = models.TextField(max_length=25)
-    discount = models.DecimalField(max_digits=5,decimal_places=2)
-    total = models.DecimalField(max_digits=8,decimal_places=2)
-    date = models.DateTimeField()
-    create = models.DateTimeField(auto_now_add=True)
-    modified = models.DateTimeField(auto_now=True)
 
-    def __str__(self):
-        return '%s %s %s' % (self.number,"-",self.name)
 
 class Booking(models.Model):
     """
@@ -70,6 +52,27 @@ class Booking(models.Model):
     create = models.DateTimeField(auto_now_add=True)  # creation date
     modified = models.DateTimeField(auto_now=True)  # modification date
 
+class Invoice(models.Model):
+    """Invoice model
+    which represents an local invoice,
+
+    """
+    booking = models.ForeignKey(
+        Booking, on_delete=models.PROTECT,null=True)  # you cant delete the booking if it has Bookings 
+    nit = models.TextField(max_length=25)
+    name = models.TextField(max_length=100)
+    number = models.IntegerField()
+    status = models.TextField(max_length=100)
+    auth_number = models.TextField(max_length=25)
+    code_control = models.TextField(max_length=25)
+    discount = models.DecimalField(max_digits=5,decimal_places=2)
+    total = models.DecimalField(max_digits=8,decimal_places=2)
+    date = models.DateTimeField()
+    create = models.DateTimeField(auto_now_add=True)
+    modified = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return '%s %s %s' % (self.number,"-",self.name)
 
 class BookingRoom(models.Model):
     """
@@ -77,7 +80,7 @@ class BookingRoom(models.Model):
     Booking vs Rooms
     """
     room = models.ForeignKey(
-        Room, on_delete=models.PROTECT)  # you cant delete the room if it has Bookings 
+        Room, on_delete=models.PROTECT)  # you cant delete a booked room if it has Bookings 
     booking = models.ForeignKey(
         Booking, on_delete=models.PROTECT)  # you cant delete the booking if it has Bookings 
     status = models.IntegerField(default=1) # could has their own status

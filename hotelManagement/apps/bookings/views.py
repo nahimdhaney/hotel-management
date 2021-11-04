@@ -3,9 +3,9 @@ from rest_framework.decorators import api_view
 from rest_framework.views import APIView
 from django.db.transaction import atomic
 from django.db import transaction
-from .models import Client,Room,Booking,BookingRoom
+from .models import Client,Room,Booking,BookingRoom,Payment,Invoice
 from rest_framework.response import Response
-from .serializers import ClientMSerializer,RoomSerializer,BookingRoomSerializer,BookingSerializer
+from .serializers import ClientMSerializer,RoomSerializer,BookingRoomSerializer,BookingSerializer,InvoiceSerializer,PaymentSerializer
 from rest_framework.exceptions import ValidationError
 from django.db.models import Q
 
@@ -113,4 +113,34 @@ def BookingViewSet(request,*args,**kwargs):
         else:
             pass
     return Response(data)
-    
+
+
+@api_view(['GET','POST'])
+def InvoiceViewSet(request,*args,**kwargs):
+    if request.method == 'GET':
+        invoices = Invoice.objects.all()
+        data = []
+        for invoice in invoices:
+            serializer = InvoiceSerializer(invoice)
+            data.append(serializer.data)
+    if request.method == 'POST':
+        serializer = InvoiceSerializer(data=request.data)
+        if serializer.is_valid(raise_exception=True) :
+            serializer.save()
+            data = serializer.data
+    return Response(data)
+
+@api_view(['GET','POST','DELETE'])
+def PaymentViewSet(request,*args,**kwargs):
+    if request.method == 'GET':
+        payments = Payment.objects.all()
+        data = []
+        for payment in payments:
+            serializer = PaymentSerializer(payment)
+            data.append(serializer.data)
+    if request.method == 'POST':
+        serializer = PaymentSerializer(data=request.data)
+        if serializer.is_valid(raise_exception=True) :
+            serializer.save()
+            data = serializer.data
+    return Response(data)
