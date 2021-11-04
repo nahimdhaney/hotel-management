@@ -98,6 +98,7 @@ class Payment(models.Model):
     booking = models.ForeignKey(
         Booking, on_delete=models.PROTECT)  # you cant delete a payment if it has Bookings asociated 
     status = models.IntegerField(default=1) # could has their own status 
+    method = models.IntegerField(default=1) #1 cash| 2 Credit Card | 3 Debit Card 
     amount = models.DecimalField(max_digits=8,decimal_places=2)
     date = models.DateField() #payment day
     create = models.DateTimeField(auto_now_add=True)  # creation date
